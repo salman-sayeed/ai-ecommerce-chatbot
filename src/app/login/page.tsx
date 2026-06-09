@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -59,6 +60,18 @@ export default function LoginPage() {
             Sign In
           </button>
         </form>
+        <div className="flex items-center justify-between text-xs text-gray-600 mt-6 pt-4 border-t border-gray-100">
+        <div>
+          <span>Don&apos;t have an account? </span>
+          <Link href="/register" className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors">
+            Sign Up
+          </Link>
+        </div>
+        
+        <Link href="/" className="text-gray-400 hover:text-gray-600 flex items-center gap-1 transition-colors">
+          ← Back to Home
+        </Link>
+      </div>
       </div>
     </div>
   );

@@ -34,7 +34,7 @@ export default async function HomePage() {
             <p className="mt-2 text-sm text-gray-500">Your onestop lifestyle brand</p>
           </div>
           
-          {/* A */}
+          {/* Authentic Session Controlled Authorization Buttons */}
           <div className="flex items-center gap-4">
             {session ? (
               <div className="flex items-center gap-3">
@@ -44,17 +44,25 @@ export default async function HomePage() {
                 <SignOutButton />
               </div>
             ) : (
-              <Link 
-                href="/login" 
-                className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500 transition"
-              >
-                Sign In
-              </Link>
+              <div className="flex items-center gap-3">
+                <Link 
+                  href="/login" 
+                  className="text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors"
+                >
+                  Sign In
+                </Link>
+                <Link 
+                  href="/register" 
+                  className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500 transition-colors"
+                >
+                  Sign Up
+                </Link>
+              </div>
             )}
           </div>
         </header>
 
-        {/* */}
+        {/* Catalog Grid View */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {products.map((product: IProduct) => (
             <div key={product._id.toString()} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition">
