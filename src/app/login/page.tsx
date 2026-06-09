@@ -1,4 +1,3 @@
-"use main"; // Note: Ensure your file template uses "use client" for interactivity if required by your layout, but "use main" or default is fine depending on structure. We will mark it client-side.
 'use client';
 
 import { useState } from "react";
@@ -24,35 +23,39 @@ export default function LoginPage() {
     if (result?.error) {
       setError(result.error);
     } else {
-      router.push("/"); // Send them to the homepage upon successful login
+      router.push("/");
     }
   };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md space-y-8 p-8 bg-white rounded-lg shadow">
-        <h2 className="text-center text-3xl font-bold tracking-tight text-gray-900">Sign in to your account</h2>
-        {error && <p className="text-red-500 text-sm text-center bg-red-50 p-2 rounded">{error}</p>}
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4 rounded-md shadow-sm">
+      <div className="w-full max-w-md space-y-6 p-8 bg-white rounded-xl shadow-md border border-gray-100">
+        <h2 className="text-center text-2xl font-bold tracking-tight text-gray-900">Sign in to your account</h2>
+        {error && <p className="text-red-500 text-sm text-center bg-red-50 p-2 rounded border border-red-100">{error}</p>}
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
             <input
               type="email"
               required
-              className="relative block w-full rounded border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm px-3"
-              placeholder="Email address"
+              className="block w-full rounded-md border border-gray-300 py-2 px-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 text-sm"
+              placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
             <input
               type="password"
               required
-              className="relative block w-full rounded border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm px-3"
-              placeholder="Password"
+              className="block w-full rounded-md border border-gray-300 py-2 px-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 text-sm"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          <button type="submit" className="group relative flex w-full justify-center rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold text-white hover:bg-indigo-500">
+          <button type="submit" className="w-full flex justify-center rounded-md bg-indigo-600 py-2 px-4 text-sm font-semibold text-white hover:bg-indigo-500 transition shadow">
             Sign In
           </button>
         </form>
