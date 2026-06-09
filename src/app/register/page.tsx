@@ -4,4 +4,4 @@ export default function RegisterPage() {
       <h1>Register</h1>
     </div>
   );
-}
+} 

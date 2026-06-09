@@ -25,14 +25,15 @@ export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     const user = session?.user as AuthenticatedUser | undefined;
-
+      
     if (!user || !user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     await connectDB();
     const userId = user.id;
-
+    // const userId = "65f000000000000000000001"; 
+    
     let cart = await Cart.findOne({ userId });
     if (!cart) {
       cart = await Cart.create({ userId, items: [] });
@@ -62,6 +63,7 @@ export async function POST(req: Request) {
 
     await connectDB();
     const userId = user.id;
+    //const userId = "65f000000000000000000001"; 
 
     let cart = await Cart.findOne({ userId });
     if (!cart) {
