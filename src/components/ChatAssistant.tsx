@@ -57,25 +57,40 @@ export default function ChatAssistant() {
 
       if (data.reply) { setMessages((prev) => [...prev, { sender: "bot", text: data.reply ?? "" }]);}
 
-      
-      if (data.actions && data.actions.length > 0) {
-        for (const action of data.actions) {
-          if (action.type === "ADD_TO_CART" && action.productId) {
+        if (data.actions && data.actions.length > 0) {
+          for (const action of data.actions) {
             
-            await fetch("/api/cart", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                productId: action.productId,
-                name: action.name,
-                price: action.price,
-                size: action.size || "M", 
-                quantity: 1
-              }),
-            });
+            //Handle Additions
+            if (action.type === "ADD_TO_CART" && action.productId) {
+              await fetch("/api/cart", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  productId: action.productId,
+                  name: action.name,
+                  price: action.price,
+                  size: action.size || "M",
+                  quantity: 1
+                }),
+              });
+              window.dispatchEvent(new Event("refreshCart")); // Live update count
+            } 
+            
+            //Removals via AI Commands
+            else if (action.type === "REMOVE_FROM_CART" && action.productId) {
+              await fetch("/api/cart/remove", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  productId: action.productId,
+                  size: action.size || "M" 
+                }),
+              });
+              window.dispatchEvent(new Event("refreshCart")); // Live update count
+            }
+            
           }
         }
-      }
 
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
