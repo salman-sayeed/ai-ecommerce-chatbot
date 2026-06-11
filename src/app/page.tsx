@@ -5,6 +5,7 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import SignOutButton from "@/components/SignOutButton"; 
+import ChatAssistant from "@/components/ChatAssistant";
 
 interface IProduct {
   _id: { toString: () => string }; 
@@ -105,6 +106,9 @@ export default async function HomePage() {
           ))}
         </div>
       </div>
+      
+      {/* AI ASSISTANT here*/}
+      <ChatAssistant />
     </main>
   );
 }

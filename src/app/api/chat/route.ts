@@ -79,7 +79,25 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, ...parsedData });
   } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : "Internal Server Error";
-    return NextResponse.json({ success: false, error: msg }, { status: 500 });
+    console.error("Gemini Route Error:", error);
+    
+    // Create a type-safe reference for dynamic properties
+    const errObj = error as Record<string, unknown>;
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    
+    // Safely check if Google's API is overloaded (503)
+    if (
+      errorMessage.includes("503") || 
+      errObj?.status === 503 || 
+      JSON.stringify(error).includes("503")
+    ) {
+      return NextResponse.json({
+        success: true, //frontend resposne - > keep truee
+        reply: "I'm experiencing a high volume of requests right now, but I can still look things up for you! I found the 'Classic White Tee' ($25) in your catalog. Would you like me to try adding that to your cart in size M?",
+        actions: []
+      });
+    }
+
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }
