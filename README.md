@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<img src="https://imgur.com/IV10177.png" height="200" alt="Logo">
 
-## Getting Started
+# KIORI-IRO  AI E-Commerce Shopping Assistant
 
-First, run the development server:
+A lightweight full-stack conversational e-commerce web application built using **Next.js 15**, **MongoDB Atlas**, and **Google Gemini 2.5 Flash**. The application features an interactive split-storefront design where traditional visual shopping interfaces work in perfect harmony with a natural-language AI agent.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+**Vercel Link:** <a href="https://ai-ecommerce-chatbot-five.vercel.app/">https://ai-ecommerce-chatbot-five.vercel.app/</a> 
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 💠 Core Features Built
+* **Dynamic Catalog Grid:** Renders t-shirts and pants with dynamic, database-backed size pills indicating active stock availability.
+* **Dual-State Shopping Cart:** A responsive slide-out drawer UI that updates live using custom DOM broadcast events. Supports secure MongoDB entries for authenticated accounts and falls back to a browser `localStorage` engine for guest shoppers.
+* **Intent-Driven Chatbot Widget:** Leverages Gemini to parse user inputs directly into discrete code execution hooks (`ADD_TO_CART`, `REMOVE_FROM_CART`, `CLEAR_CART`, `NONE`) returned via strict JSON schemas.
+* **Real-time Stock Guard Interceptor:** An API-side validation loop that intercepts out-of-stock requests, cancels database injections, and gracefully flags product constraints via customized user alerts.
+* **Robust Quota Failovers:** Built-in catch blocks that recognize `429 (Resource Exhaustion)` or `503 (Overload)` API states, transitioning to informative user prompts to prevent UI freezing.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 💠 Technical Implementation Challenges & Solutions
 
-## Learn More
+### 1. Managing API Quota Limitations on Free-Tier LLMs
+* **The Problem:** The main problem I faced during development i that the 2.5 Flash caps requests at 20 queries daily per project. Heavy user interactions or malicious script execution can cause a `429 RESOURCE_EXHAUSTED` failure state breaking the chat loop.
+* **The Solution:** I never worked with Google gen ai so I had to take help from Gemini. With the help of gemini I Implemented defensive programming block in the API route (`src/app/api/chat/route.ts`). If a 429 error occurs, the code  intercepts it passes a `success: true` flag back to prevent frontend console failure. I need to work more with the ai to implement it properly, for now this will do. 
 
-To learn more about Next.js, take a look at the following resources:
+### 2.Strict Type Safety Under Compilation Constraints
+* **The Problem:** This problem was anyoing. It was caused by Casting fetched database records loosely via TypeScript's `any` data structures caused production build blocks (`npm run build`).
+* **The Solution:** Again with the assistance of AI, I ensured clean compilation without layout execution penalties.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 💠 Knowledge & Skills Learned
+* **Google Gen Ai and response handling:** THis was my first time working with LLM. Googles genai was confuing but thankfully I wend through the documentaion and took assistance fom ai. Cant sum up everything in this tiny place but This was my first time working on a E-Commerce, So I made sure that I take few things from here.
 
-## Deploy on Vercel
+## 💠 AI Tool Utilization Workflow
+This is interesting, I was already late because I was not in Dhaka. So fired up gemini and told her to generat a 7 day sprint plan to complete the whole task and making sure we follow strict es lint, global code practices and to follow the core principles of MVC structure (I told her not to follow a strict MVC, because we are not making the whole ecommerce and I dont want unnecessary folders now). After that I mapped everything ong google docs and set few goals then I generated blocks of code through the help of gemnini and adjusted/rewrote it to my liking. I made few changes on the frontend and created few things so that I can deliver the task by deadline.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 💠 Local Architecture Setup
+Follow these quick steps to launch the system on your machine:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Clone the Project:**
+   ```bash
+    git clone <your-repository-link>
+    cd <your-repository-folder>
+    ```
+2. **Configure Environment Variables (.env.local):**
+
+    ```bash
+    MONGODB_URI=your_mongodb_atlas_connection_string
+    NEXTAUTH_SECRET=your_nextauth_jwt_secret
+    GEMINI_API_KEY=your_google_gemini_api_key
+    NEXTAUTH_URL=http://localhost:3000
+    ```
+3. **Install Dependencies:**
+    ```bash
+    npm install
+    ```
+3. **Boot Up Local Development Server:**
+    ```bash
+    npm run dev
+    ```
+4. **Open http://localhost:3000 to view the running app.**
+
+## 💠 Screenshots
+
+1. <img height="300" src="https://imgur.com/I8CRjR4.png" >
+
+2. <img height="300" src="https://imgur.com/HxTibpa.png" >
+
+3. <img height="300" src="https://imgur.com/RSFIPud.png" >
+
