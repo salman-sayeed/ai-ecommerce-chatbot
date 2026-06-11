@@ -130,7 +130,10 @@ export default function CartSidebar() {
                   <span>Subtotal</span>
                   <span>${totalPrice}</span>
                 </div>
-                <button className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-lg text-sm transition shadow">
+                <button 
+                  onClick={() => window.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ", "_blank")}
+                  className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-lg text-sm transition shadow"
+                >
                   Proceed to Checkout
                 </button>
               </div>

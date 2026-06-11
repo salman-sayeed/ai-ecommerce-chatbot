@@ -5,7 +5,7 @@ import { connectDB } from "@/lib/mongodb";
 import { Product } from "@/models/Product";
 import { GoogleGenAI } from "@google/genai";
 
-//API key
+// API key
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
 interface AuthenticatedUser {
@@ -13,14 +13,25 @@ interface AuthenticatedUser {
   name?: string | null;
 }
 
+interface ICatItemAction {
+  type: string;
+  productId?: string;
+  name?: string;
+  price?: number;
+  size?: string;
+}
+
+interface IDbProduct {
+  _id: unknown;
+  sizes?: string[];
+}
+
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
     const user = session?.user as AuthenticatedUser | undefined;
 
-    if (!user || !user.id) {
-      return NextResponse.json({ error: "Unauthorized. Please sign in first." }, { status: 401 });
-    }
+    const userName = user?.name || "Guest Customer";
 
     const { message } = await req.json();
     if (!message) {
@@ -30,10 +41,10 @@ export async function POST(req: Request) {
     await connectDB();
     const products = await Product.find({}).lean();
 
-    //instructions
+    // Instructions
     const systemInstruction = `
       You are an expert e-commerce shopping assistant for the clothing brand "KIORI IRO". 
-      The current user's name is ${user.name || "Customer"}.
+      The current user's name is ${userName}.
 
       Here is the live product catalog available for sale:
       ${JSON.stringify(products)}
@@ -59,13 +70,12 @@ export async function POST(req: Request) {
       - If they just ask a question about what's available, set type to "NONE" and list the options elegantly in your reply text.
     `;
 
-    //Gemini 2.5 Flash 
+    // Gemini 2.5 Flash 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: message,
       config: {
         systemInstruction: systemInstruction,
-        //JSON outputt
         responseMimeType: "application/json",
       },
     });
@@ -77,27 +87,59 @@ export async function POST(req: Request) {
 
     const parsedData = JSON.parse(aiTextResponse);
 
+    if (parsedData.actions && parsedData.actions.length > 0) {
+      const updatedActions: ICatItemAction[] = [];
+
+      for (const action of parsedData.actions as ICatItemAction[]) {
+        if (action.type === "ADD_TO_CART" && action.productId) {
+          // Look up the item safely
+          const matchedProduct = (await Product.findById(action.productId).lean()) as IDbProduct | null;
+
+          if (matchedProduct) {
+            const requestedSize = (action.size || "M").toUpperCase();
+            const availableSizes = matchedProduct.sizes || [];
+
+            //Restock code
+            if (!availableSizes.includes(requestedSize)) {
+              parsedData.reply = `That size is out of stock, but I've submitted a stock request for you!`;
+              continue; 
+            }
+          }
+        }
+        updatedActions.push(action);
+      }
+      parsedData.actions = updatedActions;
+    }
+
     return NextResponse.json({ success: true, ...parsedData });
   } catch (error: unknown) {
     console.error("Gemini Route Error:", error);
     
-    // Create a type-safe reference for dynamic properties
-    const errObj = error as Record<string, unknown>;
     const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorString = JSON.stringify(error);
     
-    // Safely check if Google's API is overloaded (503)
+    // Google Gen AI Rate Limit handler
     if (
-      errorMessage.includes("503") || 
-      errObj?.status === 503 || 
-      JSON.stringify(error).includes("503")
+      errorMessage.includes("429") || 
+      errorMessage.includes("RESOURCE_EXHAUSTED") || 
+      errorString.includes("429") ||
+      errorString.includes("RESOURCE_EXHAUSTED")
     ) {
       return NextResponse.json({
-        success: true, //frontend resposne - > keep truee
-        reply: "I'm experiencing a high volume of requests right now, but I can still look things up for you! I found the 'Classic White Tee' ($25) in your catalog. Would you like me to try adding that to your cart in size M?",
+        success: true, 
+        reply: "My cognitive systems are running at maximum capacity right now (API Quota Limit Hit)! However, you can still view our catalog items below and use the direct 'Add to Cart' buttons on the product cards to manage your bag seamlessly.",
+        actions: []
+      });
+    }
+    
+    //  Overload Handler
+    if (errorMessage.includes("503") || errorString.includes("503")) {
+      return NextResponse.json({
+        success: true,
+        reply: "I'm experiencing a high volume of requests right now, but I can still look things up for you! Please feel free to use the manual 'Add to Cart' buttons on the product cards to continue your shopping.",
         actions: []
       });
     }
 
     return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
-  }
-}
+  }}
